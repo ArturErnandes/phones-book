@@ -1,15 +1,12 @@
 import os
+import uvicorn
 
 from dotenv import load_dotenv
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-
-import uvicorn
-
-from pydantic import BaseModel
+from endpoints import router
 
 
 load_dotenv()
@@ -27,8 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-engine = create_async_engine(f'postgresql+asyncpg://postgres:{db_pass}@localhost:{db_port}/contacts_mai')
-
-new_session = async_sessionmaker(engine, expire_on_commit=False)
+app.include_router(router)
 
 
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
