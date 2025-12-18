@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 from pydantic import BaseModel
 
-from database import get_subscribers, create_subscriber, PhoneAlreadyExists, SessionDep
+from database import get_subscribers_db, new_subscriber_db, delete_subscriber_db, PhoneAlreadyExists, SessionDep
 
 router = APIRouter()
 
@@ -15,9 +15,9 @@ def get_info():
 
 
 @router.get("/subscribers", tags=["Абоненты"], summary="Получение спииска абонентов")
-async def call_subscribers(session: SessionDep):
+async def get_subscribers(session: SessionDep):
 
-    subs = await get_subscribers(session)
+    subs = await get_subscribers_db(session)
 
     return {"data": subs}
 
@@ -37,7 +37,7 @@ class AddSubscriber(BaseModel):
 async def new_subscriber(data: AddSubscriber, session: SessionDep):
     print(data.model_dump())
     try:
-        subs_id = await create_subscriber(data, session)
+        subs_id = await new_subscriber_db(data, session)
 
         return {"success": True, "subscriber_id": subs_id}
 
@@ -48,3 +48,10 @@ async def new_subscriber(data: AddSubscriber, session: SessionDep):
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
+@router.delete("/subscribers/{subs_id}", tags=["Абоненты"], summary="Удаление абонента")
+async def delete_subscriber(subs_id: int, session: SessionDep):
+    try:
+        await delete_subscriber_db(subs_id, session)
+        return {"success": True}
+    except Exception as e:
+        return {"Ошибка при удалении абонента": str(e)}
