@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Абоненты</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="page-header">
+    <h1>Абоненты</h1>
+
+    <div class="search-bar">
+        <input id="fam" placeholder="Фамилия">
+        <input id="name" placeholder="Имя">
+        <input id="surnm" placeholder="Отчество">
+        <input id="street" placeholder="Улица">
+        <button onclick="search()">Поиск</button>
+    </div>
+
+    <button class="add-btn" onclick="openModal()">Добавить абонента</button>
+</header>
+
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Улица</th>
+            <th>Дом</th>
+            <th>Корпус</th>
+            <th>Квартира</th>
+            <th>Телефон</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+</div>
+
+<!-- МОДАЛКА -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Добавить абонента</h2>
+
+        <input id="m_fam" placeholder="Фамилия">
+        <input id="m_name" placeholder="Имя">
+        <input id="m_surnm" placeholder="Отчество">
+        <input id="m_street" placeholder="Улица">
+        <input id="m_bldng" placeholder="Дом">
+        <input id="m_bldng_k" placeholder="Корпус">
+        <input id="m_appr" placeholder="Квартира">
+        <input id="m_ph" placeholder="Телефон">
+
+        <div class="modal-actions">
+            <button onclick="createSubscriber()">Сохранить</button>
+            <button onclick="closeModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
