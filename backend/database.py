@@ -121,7 +121,59 @@ async def new_subscriber_db(data, session: AsyncSession) -> int:
 
 async def delete_subscriber_db(subs_id, session: AsyncSession):
     async with session.begin():
+        await session.execute(text("""DELETE FROM subscribers WHERE subs_id = :subs_id RETURNING subs_id"""),{"subs_id": subs_id})
 
-        result = await session.execute(
-            text("""DELETE FROM subscribers WHERE subs_id = :subs_id RETURNING subs_id"""),
-            {"subs_id": subs_id})
+
+async def search_subscribers_db(
+    session: AsyncSession,
+    fam: str | None = None,
+    name: str | None = None,
+    surnm: str | None = None,
+    street: str | None = None,
+) -> list[dict]:
+
+    conditions = []
+    params = {}
+
+    if fam:
+        conditions.append("f.fam_value = lower(trim(:fam))")
+        params["fam"] = fam
+
+    if name:
+        conditions.append("n.name_value = lower(trim(:name))")
+        params["name"] = name
+
+    if surnm:
+        conditions.append("sn.snm_value = lower(trim(:surnm))")
+        params["surnm"] = surnm
+
+    if street:
+        conditions.append("st.street_value = lower(trim(:street))")
+        params["street"] = street
+
+    where_clause = ""
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    query = f"""
+        SELECT
+            s.subs_id,
+            f.fam_value      AS fam,
+            n.name_value     AS name,
+            sn.snm_value     AS surnm,
+            st.street_value  AS street,
+            s.bldng,
+            s.bldng_k,
+            s.appr,
+            s.ph_num
+        FROM subscribers s
+        JOIN fams f ON s.fam = f.fam_id
+        JOIN names n ON s.name_ = n.name_id
+        LEFT JOIN surnames sn ON s.surnm = sn.snm_id
+        LEFT JOIN streets st ON s.street = st.street_id
+        {where_clause}
+        ORDER BY s.subs_id
+    """
+
+    result = await session.execute(text(query), params)
+    return [dict(row) for row in result.mappings().all()]
