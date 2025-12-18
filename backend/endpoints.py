@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException
 
 from pydantic import BaseModel
 
+from database import get_subscribers, SessionDep
+
 router = APIRouter()
 
 
@@ -13,7 +15,8 @@ def get_info():
 
 
 @router.get("/subscribers", tags=["Абоненты"], summary="Получение спииска абонентов")
-def get_subscribers():
-    ...
+async def call_subscribers(session: SessionDep):
 
-    return {"success": True}
+    subs = await get_subscribers(session)
+
+    return {"data": subs}
