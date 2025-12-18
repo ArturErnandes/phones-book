@@ -14,12 +14,13 @@ from typing import Annotated
 
 load_dotenv()
 
+db_admin = os.getenv("DB_ADMIN")
 db_pass = os.getenv("DB_PASS")
 db_port = os.getenv("DB_PORT")
 db_name = os.getenv("DB_NAME")
 
 
-engine = create_async_engine(f'postgresql+asyncpg://postgres:{db_pass}@localhost:{db_port}/{db_name}')
+engine = create_async_engine(f'postgresql+asyncpg://{db_admin}:{db_pass}@localhost:{db_port}/{db_name}')
 
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -32,7 +33,7 @@ async def get_session():
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
-async def get_subscribers(session: AsyncSession):
+async def get_subscribers_db(session: AsyncSession):
     query = text("""
         SELECT
             s.subs_id,
@@ -63,7 +64,7 @@ class PhoneAlreadyExists(Exception):
     pass
 
 
-async def create_subscriber(data, session: AsyncSession) -> int:
+async def new_subscriber_db(data, session: AsyncSession) -> int:
     async with session.begin():
 
         exists = await session.execute(text("SELECT 1 FROM subscribers WHERE ph_num = :ph"),
@@ -116,3 +117,11 @@ async def create_subscriber(data, session: AsyncSession) -> int:
         )
 
         return result.scalar_one()
+
+
+async def delete_subscriber_db(subs_id, session: AsyncSession):
+    async with session.begin():
+
+        result = await session.execute(
+            text("""DELETE FROM subscribers WHERE subs_id = :subs_id RETURNING subs_id"""),
+            {"subs_id": subs_id})
