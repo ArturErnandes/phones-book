@@ -1,9 +1,9 @@
 #Файл с эндпоинтами
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from pydantic import BaseModel
 
-from database import get_subscribers, create_subscriber, SessionDep
+from database import get_subscribers, create_subscriber, PhoneAlreadyExists, SessionDep
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def call_subscribers(session: SessionDep):
 
 class AddSubscriber(BaseModel):
     fam: str
-    name_: str
+    name: str
     surnm: str | None = None
     street: str | None = None
     bldng: str | None = None
@@ -34,9 +34,17 @@ class AddSubscriber(BaseModel):
 
 
 @router.post("/new_subscriber", tags=["Абоненты"], summary="Создание нового абонента")
-async def new_sub(data: AddSubscriber, session: SessionDep):
+async def new_subscriber(data: AddSubscriber, session: SessionDep):
+    print(data.model_dump())
+    try:
+        subs_id = await create_subscriber(data, session)
 
-    await create_subscriber(data, session)
+        return {"success": True, "subscriber_id": subs_id}
 
-    return {"success": True}
+    except PhoneAlreadyExists:
+        raise HTTPException(status_code=400, detail="Абонент с таким номером телефона уже существует")
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
 
