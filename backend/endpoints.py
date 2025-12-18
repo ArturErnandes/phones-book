@@ -1,15 +1,15 @@
 #Файл с эндпоинтами
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from pydantic import BaseModel
 
-from database import get_subscribers_db, new_subscriber_db, delete_subscriber_db, PhoneAlreadyExists, SessionDep
+from database import get_subscribers_db, new_subscriber_db, delete_subscriber_db, search_subscribers_db, PhoneAlreadyExists, SessionDep
 
 router = APIRouter()
 
 
 
-@router.get("/info", tags=["Главная страница"], summary="Отображения текста на главной странице")
+@router.get("/", tags=["Главная страница"], summary="Отображения текста на главной странице")
 def get_info():
     return {"message": "Телефонный справочник"}
 
@@ -20,6 +20,28 @@ async def get_subscribers(session: SessionDep):
     subs = await get_subscribers_db(session)
 
     return {"data": subs}
+
+
+@router.get("/subscribers/search", tags=["Абоненты"], summary="Поиск абонентов по ФИО и улице")
+async def search_subscribers_endpoint(
+    session: SessionDep,
+    fam: str | None = Query(None, description="Фамилия"),
+    name: str | None = Query(None, description="Имя"),
+    surnm: str | None = Query(None, description="Отчество"),
+    street: str | None = Query(None, description="Улица"),
+):
+    result = await search_subscribers_db(
+        session=session,
+        fam=fam,
+        name=name,
+        surnm=surnm,
+        street=street,
+    )
+
+    return {
+        "count": len(result),
+        "data": result
+    }
 
 
 class AddSubscriber(BaseModel):
@@ -33,7 +55,7 @@ class AddSubscriber(BaseModel):
     ph_num: str
 
 
-@router.post("/new_subscriber", tags=["Абоненты"], summary="Создание нового абонента")
+@router.post("/subscribers/new_subscriber", tags=["Абоненты"], summary="Создание нового абонента")
 async def new_subscriber(data: AddSubscriber, session: SessionDep):
     print(data.model_dump())
     try:
@@ -48,10 +70,12 @@ async def new_subscriber(data: AddSubscriber, session: SessionDep):
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
-@router.delete("/subscribers/{subs_id}", tags=["Абоненты"], summary="Удаление абонента")
+@router.delete("/subscribers/delete/{subs_id}", tags=["Абоненты"], summary="Удаление абонента")
 async def delete_subscriber(subs_id: int, session: SessionDep):
     try:
         await delete_subscriber_db(subs_id, session)
         return {"success": True}
     except Exception as e:
         return {"Ошибка при удалении абонента": str(e)}
+
+
