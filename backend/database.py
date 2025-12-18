@@ -59,3 +59,5 @@ async def get_subscribers(session: AsyncSession):
     return [dict(row) for row in rows]
 
 
+async def create_subscriber(data, session: AsyncSession):
+    ...
