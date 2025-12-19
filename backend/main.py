@@ -20,5 +20,4 @@ app.include_router(router)
 
 
 if __name__ == "__main__":
-    print("Документация: http://127.0.0.1:8000/docs")
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
