@@ -1,0 +1,44 @@
+.liquid-ether-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.cta-button {
+  position: relative;
+  overflow: hidden;
+
+  --x: 50%;
+  --y: 50%;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+
+  background: radial-gradient(
+    200px circle at var(--x) var(--y),
+    rgba(255, 200, 255, 0.35),
+    transparent 60%
+  );
+
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.cta-button:hover::before {
+  opacity: 1;
+}
+
+.cta-button:hover {
+  transform: translateY(-1px);
+}
