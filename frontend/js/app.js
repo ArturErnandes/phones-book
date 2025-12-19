@@ -36,7 +36,14 @@ function render(list) {
             <td>${s.bldng_k ?? ''}</td>
             <td>${s.appr ?? ''}</td>
             <td>${s.ph_num}</td>
-            <td><span class="delete" onclick="remove(${s.subs_id})">🗑</span></td>
+            <td>
+              <img
+                src="/icons/bin.svg"
+                class="delete"
+                onclick="remove(${s.subs_id})"
+                alt="Удалить"
+              />
+            </td>
         `;
         body.appendChild(tr);
     });
