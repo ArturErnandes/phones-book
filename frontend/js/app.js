@@ -1,4 +1,4 @@
-const API = 'http://127.0.0.1:8000';
+const API = 'http://45.140.179.251:8000';
 
 const colors = [
     '#67D4FF',
