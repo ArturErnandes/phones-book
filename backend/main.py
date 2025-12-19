@@ -9,11 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from endpoints import router
 
 
-load_dotenv()
-
-db_pass = os.getenv("DB_PASS")
-db_port = os.getenv("DB_PORT")
-
 app = FastAPI()
 
 app.add_middleware(
