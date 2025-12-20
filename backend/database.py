@@ -130,6 +130,7 @@ async def search_subscribers_db(
     name: str | None = None,
     surnm: str | None = None,
     street: str | None = None,
+    ph_num: str | None = None,
 ) -> list[dict]:
 
     conditions = []
@@ -150,6 +151,10 @@ async def search_subscribers_db(
     if street:
         conditions.append("st.street_value = lower(trim(:street))")
         params["street"] = street
+
+    if ph_num:
+        conditions.append("s.ph_num LIKE '%' || :ph_num || '%'")
+        params["ph_num"] = ph_num
 
     where_clause = ""
     if conditions:

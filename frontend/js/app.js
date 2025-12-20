@@ -51,7 +51,10 @@ function render(list) {
 
 async function search() {
     const params = new URLSearchParams();
-    ['fam','name','surnm','street'].forEach(id => {
+    ['fam','name','surnm','street','ph_num'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
         const v = document.getElementById(id).value;
         if (v) params.append(id, v);
     });

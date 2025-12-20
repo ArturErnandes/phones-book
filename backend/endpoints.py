@@ -29,6 +29,7 @@ async def search_subscribers_endpoint(
     name: str | None = Query(None, description="Имя"),
     surnm: str | None = Query(None, description="Отчество"),
     street: str | None = Query(None, description="Улица"),
+    ph_num: str | None = Query(None, description="Телефон")
 ):
     result = await search_subscribers_db(
         session=session,
@@ -36,6 +37,7 @@ async def search_subscribers_endpoint(
         name=name,
         surnm=surnm,
         street=street,
+        ph_num=ph_num,
     )
 
     return {
